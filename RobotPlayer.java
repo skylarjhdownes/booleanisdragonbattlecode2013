@@ -34,7 +34,6 @@ public class RobotPlayer
 	private static void runHeadquarters() throws GameActionException 
 	{
 		Direction spawnDir = getFirstEmptySquareClockwiseFromTop();
-		System.out.println(spawnDir);
 		if(rc.isActive()&&rc.senseRobotCount()<GameConstants.MAX_ROBOTS&&spawnDir!=Direction.NONE){
 			rc.spawn(spawnDir);
 		}
@@ -47,13 +46,12 @@ public class RobotPlayer
 		int dirChangeCount = 0;
 		while (!rc.canMove(returnDir) && dirChangeCount < 8)
 		{
-			System.out.println(dirChangeCount);
 			returnDir = returnDir.rotateRight();
 			dirChangeCount++;
 		}
 		if(dirChangeCount>=8)
 		{
-			System.out.println("Potato");
+			
 			return Direction.NONE;
 		}
 		else
