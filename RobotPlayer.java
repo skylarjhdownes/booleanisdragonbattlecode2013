@@ -1,4 +1,4 @@
-package potatos;
+package team097;
 
 import battlecode.common.*;
 import java.util.*;
