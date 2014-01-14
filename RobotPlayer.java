@@ -73,21 +73,20 @@ public class RobotPlayer
 	
 	private static Direction getFirstEmptySquareClockwiseFromTop() throws GameActionException 
 	{
-		Direction returnDir = Direction.NORTH_WEST;
+		Direction returnDir = Direction.NORTH_WEST; //Start arbitrarily with NorthWest
 		int dirChangeCount = 0;
-		while (!rc.canMove(returnDir) && dirChangeCount < 8)
-		{
-			returnDir = returnDir.rotateRight();
-			dirChangeCount++;
+		while (!rc.canMove(returnDir) && dirChangeCount < 8) //If the square is full, 
+		{					     //and we haven't checked all the squares yet,
+			returnDir = returnDir.rotateRight(); //check the next square, clockwise,
+			dirChangeCount++;                    //and increment the counter
 		}
 		if(dirChangeCount>=8)
 		{
-			
-			return Direction.NONE;
+			return Direction.NONE; //If all the squares are full
 		}
-		else
+		else 
 		{
-			return returnDir;
+			return returnDir; //Returns the first empty square detected
 		}
 	}
 }
