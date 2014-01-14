@@ -7,6 +7,7 @@ public class RobotPlayer
 {
 	public static RobotController rc;
 	static Random randomThing = new Random();
+	static Direction allDirections[] = Direction.values();
 	
 	public static void run(RobotController rcin)
 	{
@@ -28,8 +29,22 @@ public class RobotPlayer
 
 	private static void runSoldier() throws GameActionException 
 	{
-		
-	}
+		//movement
+		int randomMovement = (int)(randomThing.nextDouble()*12);
+		System.out.println(randomMovement);
+		if(randomMovement < 9) {
+			Direction chosenDir = allDirections[randomMovement];
+			if(rc.isActive() && rc.canMove(chosenDir)) {
+				rc.move(chosenDir);
+			} //end inner if
+		} //end outer if
+		else {
+			Direction towardsEnemyHQ = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
+			if(rc.isActive() && rc.canMove(towardsEnemyHQ)) {
+				rc.move(towardsEnemyHQ);
+			}//end inner if
+		} //end else
+	} //end runSoldier()
 	
 	private static void runHeadquarters() throws GameActionException 
 	{
