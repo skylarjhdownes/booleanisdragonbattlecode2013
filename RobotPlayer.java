@@ -29,9 +29,25 @@ public class RobotPlayer
 
 	private static void runSoldier() throws GameActionException 
 	{
+		//attacking
+		Robot[] enemyRobotsInRange = rc.senseNearbyGameObjects(Robot.class, 100, rc.getTeam().opponent());
+		if(enemyRobotsInRange.length > 0) {
+			Robot target = enemyRobotsInRange[0];
+			RobotInfo targetInfo;
+			targetInfo = rc.senseRobotInfo(target);
+			if(rc.isActive()) {
+				rc.attackSquare(targetInfo.location);
+			} //end inner if
+		} //end outer if
+		else { //no enemies in range, so build a tower
+			Robot[] pastrsWithinRange = rc.senseNearbyGameObjects(Robot.class, 9, null);
+			if(randomThing.nextDouble() < 0.03 && rc.sensePastrLocations(rc.getTeam()).length < 6 && pastrsWithinRange.length < 1) {
+				rc.construct(RobotType.PASTR);
+			}//end if
+		}//end else
+		
 		//movement
 		int randomMovement = (int)(randomThing.nextDouble()*12);
-		System.out.println(randomMovement);
 		if(randomMovement < 9) {
 			Direction chosenDir = allDirections[randomMovement];
 			if(rc.isActive() && rc.canMove(chosenDir)) {
