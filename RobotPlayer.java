@@ -73,11 +73,18 @@ public class RobotPlayer
 		} //end else
 	}
 	
-	private static void moveTowardsLocation()
+	private static void moveTowardsLocationDirectly(MapLocation destination) throws GameActionException 
+	{
+		Direction chosenDir = rc.getLocation().directionTo(destination);
+		if(rc.isActive() && rc.canMove(chosenDir)) {
+			rc.move(chosenDir);
+		} //end inner if
+	}
+	
+	private static void moveTowardsLocationIntelligently(MapLocation destination)
 	{
 		//TODO  Implement a pathing algorithm
 	}
-	
 	
 	private static void runHeadquarters() throws GameActionException 
 	{
