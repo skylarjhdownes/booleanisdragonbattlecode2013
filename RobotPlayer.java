@@ -30,6 +30,15 @@ public class RobotPlayer
 	private static void runSoldier() throws GameActionException 
 	{
 		//attacking
+		attackEnemiesInRange();
+		
+		//movement
+		moveRobotRandomly();
+		
+	} //end runSoldier()
+	
+	private static void attackEnemiesInRange() throws GameActionException 
+	{
 		Robot[] enemyRobotsInRange = rc.senseNearbyGameObjects(Robot.class, 100, rc.getTeam().opponent());
 		if(enemyRobotsInRange.length > 0) {
 			Robot target = enemyRobotsInRange[0];
@@ -45,8 +54,10 @@ public class RobotPlayer
 				rc.construct(RobotType.PASTR);
 			}//end if
 		}//end else
-		
-		//movement
+	}
+	
+	private static void moveRobotRandomly() throws GameActionException 
+	{
 		int randomMovement = (int)(randomThing.nextDouble()*12);
 		if(randomMovement < 9) {
 			Direction chosenDir = allDirections[randomMovement];
@@ -60,7 +71,13 @@ public class RobotPlayer
 				rc.move(towardsEnemyHQ);
 			}//end inner if
 		} //end else
-	} //end runSoldier()
+	}
+	
+	private static void moveTowardsLocation()
+	{
+		//TODO  Implement a pathing algorithm
+	}
+	
 	
 	private static void runHeadquarters() throws GameActionException 
 	{
@@ -71,6 +88,8 @@ public class RobotPlayer
 		
 	}
 	
+	
+	// Keep this method checking canMove and not if the square is empty (Void squares)
 	private static Direction getFirstEmptySquareClockwiseFromTop() throws GameActionException 
 	{
 		Direction returnDir = Direction.NORTH_WEST; //Start arbitrarily with NorthWest
