@@ -37,6 +37,8 @@ public class RobotPlayer
 		
 	} //end runSoldier()
 	
+	
+	//I think something is wrong with this, it keeps throwing exceptions
 	private static void attackEnemiesInRange() throws GameActionException 
 	{
 		Robot[] enemyRobotsInRange = rc.senseNearbyGameObjects(Robot.class, 100, rc.getTeam().opponent());
@@ -78,7 +80,28 @@ public class RobotPlayer
 		Direction chosenDir = rc.getLocation().directionTo(destination);
 		if(rc.isActive() && rc.canMove(chosenDir)) {
 			rc.move(chosenDir);
-		} //end inner if
+		} 
+	}
+	
+	private static void moveTowardsLocationBuglike(MapLocation destination) throws GameActionException 
+	{
+		Direction chosenDir = rc.getLocation().directionTo(destination);
+		if(rc.isActive())
+		{
+			if(rc.canMove(chosenDir)) 
+			{
+				rc.move(chosenDir);
+			}
+			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft()))
+			{
+				rc.move(chosenDir.rotateLeft().rotateLeft());
+			}
+			else if(rc.canMove(chosenDir.rotateRight().rotateRight()))
+			{
+				rc.move(chosenDir.rotateRight().rotateRight());
+			}
+			
+		} 
 	}
 	
 	private static void moveTowardsLocationIntelligently(MapLocation destination)
