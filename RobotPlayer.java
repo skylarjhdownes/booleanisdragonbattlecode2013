@@ -9,8 +9,8 @@ public class RobotPlayer
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
 	static int robotsProduced;
-	static boolean firstSoldier;
-	static MapLocation destination;
+	static ArrayList soldierList = new ArrayList();
+	static MapLocation place;
 	public static void run(RobotController rcin)
 	{
 		rc = rcin;
@@ -20,16 +20,22 @@ public class RobotPlayer
 				if(rc.getType()==RobotType.HQ)
 				{
 					runHeadquarters();
-					firstSoldier = true;
 				}
-				else if(rc.getType()==RobotType.SOLDIER && firstSoldier == false){
-					runSoldier();
+				else if(rc.getType()==RobotType.SOLDIER){
+//					if ()
+//					{
+//						runBuilder(place = new MapLocation(0,0));
+//					}
+//					else if (true)
+//					{
+						runSoldier();
+//					}
+//					else
+//					{
+//						runSoldier();
+//					}
 				}
-				else if(rc.getType()==RobotType.SOLDIER)
-				{
-					runBuilder(destination = new MapLocation(0,0));
-					firstSoldier = false;
-				}
+				
 				
 				rc.yield();
 			}catch (Exception e){
@@ -67,7 +73,7 @@ public class RobotPlayer
 			Robot target = enemyRobotsInRange[0];
 			RobotInfo targetInfo;
 			targetInfo = rc.senseRobotInfo(target);
-			if(rc.isActive()) {
+			if(rc.isActive() && targetInfo.getType() != RobotType.HQ) {
 				rc.attackSquare(targetInfo.location);
 			} //end inner if
 		} //end outer if
