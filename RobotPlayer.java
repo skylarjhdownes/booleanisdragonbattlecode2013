@@ -8,18 +8,29 @@ public class RobotPlayer
 	public static RobotController rc;
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
-	
+	static int robotsProduced;
+	static boolean firstSoldier;
+	static MapLocation destination;
 	public static void run(RobotController rcin)
 	{
 		rc = rcin;
 		randomThing.setSeed(rc.getRobot().getID());
 		while(true){
 			try{
-				if(rc.getType()==RobotType.HQ){
+				if(rc.getType()==RobotType.HQ)
+				{
 					runHeadquarters();
-				}else if(rc.getType()==RobotType.SOLDIER){
+					firstSoldier = true;
+				}
+				else if(rc.getType()==RobotType.SOLDIER && firstSoldier == false){
 					runSoldier();
 				}
+				else if(rc.getType()==RobotType.SOLDIER)
+				{
+					runBuilder(destination = new MapLocation(0,0));
+					firstSoldier = false;
+				}
+				
 				rc.yield();
 			}catch (Exception e){
 				e.printStackTrace();
@@ -27,6 +38,16 @@ public class RobotPlayer
 		}
 	}
 
+	private static void runBuilder(MapLocation destination) throws GameActionException 
+	{
+		//attacking
+		attackEnemiesInRange();
+		
+		//movement
+		moveTowardsLocationBuglike(destination);
+		
+	} //end runSoldier()
+	
 	private static void runSoldier() throws GameActionException 
 	{
 		//attacking
@@ -38,10 +59,10 @@ public class RobotPlayer
 	} //end runSoldier()
 	
 	
-	//I think something is wrong with this, it keeps throwing exceptions
+	
 	private static void attackEnemiesInRange() throws GameActionException 
 	{
-		Robot[] enemyRobotsInRange = rc.senseNearbyGameObjects(Robot.class, 100, rc.getTeam().opponent());
+		Robot[] enemyRobotsInRange = rc.senseNearbyGameObjects(Robot.class, 10, rc.getTeam().opponent());
 		if(enemyRobotsInRange.length > 0) {
 			Robot target = enemyRobotsInRange[0];
 			RobotInfo targetInfo;
@@ -50,12 +71,12 @@ public class RobotPlayer
 				rc.attackSquare(targetInfo.location);
 			} //end inner if
 		} //end outer if
-		else { //no enemies in range, so build a tower
-			Robot[] pastrsWithinRange = rc.senseNearbyGameObjects(Robot.class, 9, null);
-			if(randomThing.nextDouble() < 0.03 && rc.sensePastrLocations(rc.getTeam()).length < 6 && pastrsWithinRange.length < 1) {
-				rc.construct(RobotType.PASTR);
-			}//end if
-		}//end else
+//		else { //no enemies in range, so build a tower
+//			Robot[] pastrsWithinRange = rc.senseNearbyGameObjects(Robot.class, 9, null);
+//			if(randomThing.nextDouble() < 0.03 && rc.sensePastrLocations(rc.getTeam()).length < 6 && pastrsWithinRange.length < 1) {
+//				rc.construct(RobotType.PASTR);
+//			}//end if
+//		}//end else
 	}
 	
 	private static void moveRobotRandomly() throws GameActionException 
@@ -83,6 +104,7 @@ public class RobotPlayer
 		} 
 	}
 	
+	//Currently craptastic
 	private static void moveTowardsLocationBuglike(MapLocation destination) throws GameActionException 
 	{
 		Direction chosenDir = rc.getLocation().directionTo(destination);
@@ -112,8 +134,12 @@ public class RobotPlayer
 	private static void runHeadquarters() throws GameActionException 
 	{
 		Direction spawnDir = getFirstEmptySquareClockwiseFromTop();
+		
+		attackEnemiesInRange();
+		
 		if(rc.isActive()&&rc.senseRobotCount()<GameConstants.MAX_ROBOTS&&spawnDir!=Direction.NONE){
 			rc.spawn(spawnDir);
+			robotsProduced++;
 		}
 		
 	}
