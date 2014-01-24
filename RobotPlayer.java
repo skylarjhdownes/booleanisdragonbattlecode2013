@@ -17,23 +17,23 @@ public class RobotPlayer
 		randomThing.setSeed(rc.getRobot().getID());
 		while(true){
 			try{
+				if(!soldierList.contains(rc.getRobot().getID()))
+				{
+					soldierList.add(rc.getRobot().getID());
+				}
 				if(rc.getType()==RobotType.HQ)
 				{
 					runHeadquarters();
 				}
 				else if(rc.getType()==RobotType.SOLDIER){
-//					if ()
-//					{
-//						runBuilder(place = new MapLocation(0,0));
-//					}
-//					else if (true)
-//					{
+					if (rc.getRobot().getID() == soldierList.get(0))//This is bad until we make our arraylist handle dead bots
+					{
+						runBuilder(place = new MapLocation(2,2));
+					}
+					else
+					{
 						runSoldier();
-//					}
-//					else
-//					{
-//						runSoldier();
-//					}
+					}
 				}
 				
 				
@@ -49,8 +49,15 @@ public class RobotPlayer
 		//attacking
 		attackEnemiesInRange();
 		
-		//movement
-		moveTowardsLocationBuglike(destination);
+		if (rc.getLocation().equals(destination))
+		{
+			rc.construct(RobotType.PASTR);
+		}
+		else
+		{
+			//movement
+			moveTowardsLocationBuglike(destination);
+		}
 		
 	} //end runSoldier()
 	
