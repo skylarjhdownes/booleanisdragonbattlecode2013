@@ -73,7 +73,7 @@ public class RobotPlayer
 			Robot target = enemyRobotsInRange[0];
 			RobotInfo targetInfo;
 			targetInfo = rc.senseRobotInfo(target);
-			if(rc.isActive() && targetInfo.getType() != RobotType.HQ) {
+			if(rc.isActive() && targetInfo.type != RobotType.HQ) {
 				rc.attackSquare(targetInfo.location);
 			} //end inner if
 		} //end outer if
