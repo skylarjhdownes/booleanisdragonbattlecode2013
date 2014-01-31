@@ -109,6 +109,7 @@ public class Movement {
 			
 			//I bet there is actually a somewhat reasonable way to do this with an FSA.  This is not it though.
 			//I'm applying the wrong tool here, but I could use some more practice building these anyway.
+			//This gets confused easily.  I really want to make it work now though...
 		} 
 	}
 	
