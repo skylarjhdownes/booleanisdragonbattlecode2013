@@ -127,15 +127,36 @@ public class RobotPlayer
 			{
 				rc.move(chosenDir);
 			}
+			else if(rc.canMove(chosenDir.rotateLeft()))
+			{
+				rc.move(chosenDir.rotateLeft());
+			}
 			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft()))
 			{
 				rc.move(chosenDir.rotateLeft().rotateLeft());
 			}
-			else if(rc.canMove(chosenDir.rotateRight().rotateRight()))
+			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft()))
 			{
-				rc.move(chosenDir.rotateRight().rotateRight());
+				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft());
 			}
-			
+			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+			{
+				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+			}
+			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+			{
+				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+			}
+			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+			{
+				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+			}
+			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+			{
+				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+			}
+			//Fear my ridiculous triangle of DOOOOOOOOOM!!!
+			//Hehehe...
 		} 
 	}
 	
