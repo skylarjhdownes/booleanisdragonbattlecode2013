@@ -9,7 +9,7 @@ public class RobotPlayer
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
 	static int robotsProduced;
-	static ArrayList soldierList = new ArrayList();
+	static ArrayList<Integer> soldierList = new ArrayList();
 	static MapLocation place;
 	public static void run(RobotController rcin)
 	{
@@ -26,7 +26,7 @@ public class RobotPlayer
 					runHeadquarters();
 				}
 				else if(rc.getType()==RobotType.SOLDIER){
-					if (rc.getRobot().getID() == soldierList.get(0))//This is bad until we make our arraylist handle dead bots
+					if (rc.getRobot().getID() < 150)//This is bad until we make our arraylist handle dead bots
 					{
 						runBuilder(place = new MapLocation(2,2));
 					}
