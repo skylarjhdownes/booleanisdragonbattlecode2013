@@ -9,26 +9,23 @@ public class RobotPlayer
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
 	static int robotsProduced;
-	static ArrayList<Integer> soldierList = new ArrayList();
 	static MapLocation place;
+	static double[][] cowsOnMap;
 	public static void run(RobotController rcin)
 	{
 		rc = rcin;
 		randomThing.setSeed(rc.getRobot().getID());
 		while(true){
 			try{
-				if(!soldierList.contains(rc.getRobot().getID()))
-				{
-					soldierList.add(rc.getRobot().getID());
-				}
 				if(rc.getType()==RobotType.HQ)
 				{
 					runHeadquarters();
 				}
 				else if(rc.getType()==RobotType.SOLDIER){
-					if (rc.getRobot().getID() < 150)
+					if (rc.getRobot().getID() < 120)
 					{
-						runBuilder(place = new MapLocation(2,2));
+						runBuilder(place = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
+						System.out.println(rc.getMapWidth() + "///" + (rc.getMapHeight()/2));
 					}
 					else
 					{
@@ -49,15 +46,26 @@ public class RobotPlayer
 		//attacking
 		attackEnemiesInRange();
 		
-		if (rc.getLocation().equals(destination))
+//		
+		cowsOnMap = rc.senseCowGrowth();
+		if (cowsOnMap[rc.getMapWidth()-1][(rc.getMapHeight()/2)] >= 1)
 		{
-			rc.construct(RobotType.PASTR);
+			if (rc.getLocation().equals(destination) || rc.getLocation().isAdjacentTo(destination) )
+			{
+				rc.construct(RobotType.PASTR);
+			}
+			else
+			{
+				//movement
+				Movement movementInstance = new Movement();
+				movementInstance.moveTowardsLocationBuglike(rc, destination); //Should probably set this destination up to be whichever 
+			}																  //is farther from enemy HQ, or some other similar thing.
 		}
 		else
 		{
-			//movement
-			Movement.moveTowardsLocationBuglike(rc, destination);
+			runSoldier();
 		}
+		
 		
 	} //end runSoldier()
 	

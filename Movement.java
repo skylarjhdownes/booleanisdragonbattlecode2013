@@ -8,7 +8,11 @@ public class Movement {
 	
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
-
+	enum movementState {
+		noObstacle, foundObstacle, foundDeadEnd
+	}
+	static movementState dirFlag = movementState.noObstacle;
+	static Direction currentDir;
 	public static void moveRobotRandomly(RobotController rc) throws GameActionException 
 	{
 		int randomMovement = (int)(randomThing.nextDouble()*12);
@@ -32,40 +36,79 @@ public class Movement {
 		Direction chosenDir = rc.getLocation().directionTo(destination);
 		if(rc.isActive())
 		{
-			if(rc.canMove(chosenDir)) 
+			
+			if (dirFlag == movementState.noObstacle)
 			{
-				rc.move(chosenDir);
+				if(rc.canMove(chosenDir)) 
+				{
+					rc.move(chosenDir);
+					dirFlag = movementState.noObstacle;
+				}
+				if(rc.canMove(chosenDir.rotateLeft()))
+				{
+					rc.move(chosenDir.rotateLeft());
+				}
+				else if(rc.canMove(chosenDir.rotateLeft().rotateLeft()))
+				{
+					rc.move(chosenDir.rotateLeft().rotateLeft());
+				}
+				else
+				{
+					dirFlag = movementState.foundObstacle;
+					currentDir = chosenDir;
+				}
 			}
-			else if(rc.canMove(chosenDir.rotateLeft()))
+			
+			
+			if (dirFlag == movementState.foundObstacle)
 			{
-				rc.move(chosenDir.rotateLeft());
+				if(rc.canMove(currentDir)) 
+				{
+					rc.move(currentDir);
+					dirFlag = movementState.noObstacle;
+				}
+				if(rc.canMove(currentDir.rotateRight()))
+				{
+					dirFlag = movementState.noObstacle;
+					rc.move(currentDir.rotateRight());
+				}
+				else if(rc.canMove(currentDir.rotateRight().rotateRight()))
+				{
+					rc.move(currentDir.rotateRight().rotateRight());
+				}
+				else
+				{
+					dirFlag = movementState.foundDeadEnd;
+				}
 			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft()))
+			
+			if (dirFlag == movementState.foundDeadEnd)
 			{
-				rc.move(chosenDir.rotateLeft().rotateLeft());
+				if(rc.canMove(currentDir.rotateLeft()))
+				{
+					rc.move(currentDir.rotateLeft());
+				}
+				else if(rc.canMove(currentDir.rotateLeft().rotateLeft()))
+				{
+					rc.move(currentDir.rotateLeft().rotateLeft());
+				}
+				else if(rc.canMove(currentDir.rotateLeft().rotateLeft().rotateLeft()))
+				{
+					rc.move(currentDir.rotateLeft().rotateLeft().rotateLeft());
+				}
+				else if(rc.canMove(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+				{
+					rc.move(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+				}
+				else if(rc.canMove(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+				{
+					rc.move(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+				}
 			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			//Fear my ridiculous triangle of DOOOOOOOOOM!!!
-			//Hehehe...  So terrible.
+			
+			
+			//I bet there is actually a somewhat reasonable way to do this with an FSA.  This is not it though.
+			//I'm applying the wrong tool here, but I could use some more practice building these anyway.
 		} 
 	}
 	
