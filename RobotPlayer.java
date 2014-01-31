@@ -26,7 +26,7 @@ public class RobotPlayer
 					runHeadquarters();
 				}
 				else if(rc.getType()==RobotType.SOLDIER){
-					if (rc.getRobot().getID() < 150)//This is bad until we make our arraylist handle dead bots
+					if (rc.getRobot().getID() < 150)
 					{
 						runBuilder(place = new MapLocation(2,2));
 					}
@@ -56,7 +56,7 @@ public class RobotPlayer
 		else
 		{
 			//movement
-			moveTowardsLocationBuglike(destination);
+			Movement.moveTowardsLocationBuglike(rc, destination);
 		}
 		
 	} //end runSoldier()
@@ -67,7 +67,7 @@ public class RobotPlayer
 		attackEnemiesInRange();
 		
 		//movement
-		moveRobotRandomly();
+		Movement.moveRobotRandomly(rc);
 		
 	} //end runSoldier()
 	
@@ -92,22 +92,7 @@ public class RobotPlayer
 //		}//end else
 	}
 	
-	private static void moveRobotRandomly() throws GameActionException 
-	{
-		int randomMovement = (int)(randomThing.nextDouble()*12);
-		if(randomMovement < 9) {
-			Direction chosenDir = allDirections[randomMovement];
-			if(rc.isActive() && rc.canMove(chosenDir)) {
-				rc.move(chosenDir);
-			} //end inner if
-		} //end outer if
-		else {
-			Direction towardsEnemyHQ = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
-			if(rc.isActive() && rc.canMove(towardsEnemyHQ)) {
-				rc.move(towardsEnemyHQ);
-			}//end inner if
-		} //end else
-	}
+	
 	
 	private static void moveTowardsLocationDirectly(MapLocation destination) throws GameActionException 
 	{
@@ -117,53 +102,8 @@ public class RobotPlayer
 		} 
 	}
 	
-	//Currently craptastic
-	private static void moveTowardsLocationBuglike(MapLocation destination) throws GameActionException 
-	{
-		Direction chosenDir = rc.getLocation().directionTo(destination);
-		if(rc.isActive())
-		{
-			if(rc.canMove(chosenDir)) 
-			{
-				rc.move(chosenDir);
-			}
-			else if(rc.canMove(chosenDir.rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			else if(rc.canMove(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
-			{
-				rc.move(chosenDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
-			}
-			//Fear my ridiculous triangle of DOOOOOOOOOM!!!
-			//Hehehe...
-		} 
-	}
+
 	
-	private static void moveTowardsLocationIntelligently(MapLocation destination)
-	{
-		//TODO  Implement a pathing algorithm
-	}
 	
 	private static void runHeadquarters() throws GameActionException 
 	{
