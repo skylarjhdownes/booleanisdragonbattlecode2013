@@ -26,15 +26,15 @@ public class RobotPlayer
 				{runHeadquarters();}
 				else if(rc.getType()==RobotType.SOLDIER)
 				{
-//						if (rc.getRobot().getID() < 120)
-//						{
-//							runBuilder(place = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
-//							//System.out.println(rc.getMapWidth() + "///" + (rc.getMapHeight()/2));
-//						}
-//						else
-//						{
+						if (rc.getRobot().getID() < 120)
+						{
+							runBuilder(place = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
+							//System.out.println(rc.getMapWidth() + "///" + (rc.getMapHeight()/2));
+						}
+						else
+						{
 							runSoldier();
-//						}
+						}
 				}
 				
 				
