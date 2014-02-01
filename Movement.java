@@ -137,6 +137,10 @@ public class Movement {
 				{
 					rc.move(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
 				}
+				else if(rc.canMove(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft()))
+				{
+					rc.move(currentDir.rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft().rotateLeft());
+				}
 			}
 			
 			
@@ -223,10 +227,11 @@ public class Movement {
 		return array;
 	} //end findAdjacent()
 	
-	public static Direction moveOnRoute(RobotController rc, MapLocation destination)
+	public static void moveOnRoute(RobotController rc, MapLocation destination) throws GameActionException
 	{
 		if(currentDestination != destination){	
 			route = Movement.pathToGoal(rc, rc.getLocation(), destination); //This is how we tell it to generate a path to some location. Path is returned as an arraylist of MapLocations.
+			currentDestination = destination;
 		}
 		
 		
@@ -234,11 +239,10 @@ public class Movement {
 			Direction directionToGoal = rc.getLocation().directionTo(route.get(0)); //Get the direction to the first Location in the arraylist (should be adjacent)
 			if(rc.canMove(directionToGoal) && rc.isActive()){ //if active and can move
 				route.remove(0);			
-				return directionToGoal;
+				rc.move(directionToGoal);
 			} //end inner if
 		} //end if
 		System.out.println("The route appears to be empty.");
-		return Direction.NONE;
 	}
 	
 }

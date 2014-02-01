@@ -10,8 +10,6 @@ public class RobotPlayer
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
 	static int robotsProduced;
-	static MapLocation farm1;
-	static MapLocation farm2;
 	static double[][] cowsOnMap;
 	static int noisetowerDirTracker = 0;
 	static int noisetowerFireTracker = 4;
@@ -29,20 +27,28 @@ public class RobotPlayer
 				{
 					if (rc.getRobot().getID() < 120)
 					{
-						runPastrBuilder(farm1 = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
+						runPastrBuilder(new MapLocation(rc.getMapWidth()-1, (rc.getMapHeight()/2)));
 					}
-					else if (rc.getRobot().getID() > 120 && rc.getRobot().getID() < 210 && rc.sensePastrLocations(rc.getTeam()).length > 0)
+					else if (rc.getRobot().getID() >= 120 && rc.getRobot().getID() < 210)
 					{
-						runTowerBuilder(rc.sensePastrLocations(rc.getTeam())[0]);
+						runTowerBuilder(new MapLocation(rc.getMapWidth()-1, (rc.getMapHeight()/2)));
 					}
-//					else if (rc.getRobot().getID() < 120)
-//					{
-//						runPastrBuilder(farm1 = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
-//					}
-//					else if (rc.getRobot().getID() > 120 && rc.getRobot().getID() < 210 && rc.sensePastrLocations(rc.getTeam()).length > 0)
-//					{
-//						runTowerBuilder(rc.sensePastrLocations(rc.getTeam())[0]);
-//					}
+					else if (rc.getRobot().getID() >= 210 && rc.getRobot().getID() < 320)
+					{
+						runPastrBuilder(new MapLocation(0, (rc.getMapHeight()/2)));
+					}
+					else if (rc.getRobot().getID() >= 320 && rc.getRobot().getID() < 500)
+					{
+						runTowerBuilder(new MapLocation(0, (rc.getMapHeight()/2)));
+					}
+					else if (rc.getRobot().getID() >= 500 && rc.getRobot().getID() < 650)
+					{
+						runPastrBuilder(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
+					}
+					else if (rc.getRobot().getID() >= 650 && rc.getRobot().getID() < 850)
+					{
+						runTowerBuilder(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
+					}
 					else
 					{
 						if (rc.sensePastrLocations(rc.getTeam().opponent()).length > 0)
@@ -53,7 +59,6 @@ public class RobotPlayer
 						{
 							runSoldier(rc.senseEnemyHQLocation());
 						} //end else
-						
 					}
 				}
 				
@@ -80,7 +85,7 @@ public class RobotPlayer
 		attackEnemiesInRange();
 		
 		cowsOnMap = rc.senseCowGrowth();
-		if (cowsOnMap[rc.getMapWidth()-1][(rc.getMapHeight()/2)] >= 1)
+		if (cowsOnMap[destination.x][destination.y] >= 1)
 		{
 			if (rc.getLocation().equals(destination) || rc.getLocation().isAdjacentTo(destination) )
 			{
@@ -90,8 +95,8 @@ public class RobotPlayer
 			{
 				//movement
 				Movement movementInstance = new Movement();
-				movementInstance.moveTowardsLocationBuglike(rc, destination); //Should probably set this destination up to be whichever 
-			}																  //is farther from enemy HQ, or some other similar thing.
+				movementInstance.moveTowardsLocationBuglike(rc, destination);
+			}																  
 		}
 		else
 		{
@@ -106,7 +111,7 @@ public class RobotPlayer
 		
 //		
 		cowsOnMap = rc.senseCowGrowth();
-		if (cowsOnMap[rc.getMapWidth()-1][(rc.getMapHeight()/2)] >= 1)
+		if (cowsOnMap[destination.x][destination.y] >= 1)
 		{
 			if (rc.getLocation().isAdjacentTo(destination) )
 			{
@@ -121,7 +126,11 @@ public class RobotPlayer
 		}
 		else
 		{
-			Movement.moveTowardsLocationBuglike(rc, farm1);
+			Movement.moveTowardsLocationBuglike(rc, new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
+//			if (rc.getLocation().isAdjacentTo(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()))-1) )
+//			{
+//				rc.construct(RobotType.PASTR);
+//			}
 		}
 		
 		
@@ -138,8 +147,9 @@ public class RobotPlayer
 		//Movement.moveRobotRandomly(rc);
 		
 		//generate a route to the enemy HQ
+		Movement movementInstance = new Movement();
 		
-		Movement.moveOnRoute(rc, destination);
+		movementInstance.moveRobotRandomlyTowardsEnemyPastr(rc);
 		
 	} //end runSoldier()
 	
@@ -149,7 +159,7 @@ public class RobotPlayer
 		{
 			if (rc.canAttackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2)))
 			{
-				rc.attackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
+				rc.attackSquareLight(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
 			}
 			noisetowerFireTracker--;
 			if (noisetowerFireTracker < 1)
