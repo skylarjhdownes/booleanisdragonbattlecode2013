@@ -9,11 +9,11 @@ public class RobotPlayer
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
 	static int robotsProduced;
-	static MapLocation farm1 = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2));
+	static MapLocation farm1;
 	static MapLocation farm2;
 	static double[][] cowsOnMap;
 	static int noisetowerDirTracker = 0;
-	static int noisetowerFireTracker = 5;
+	static int noisetowerFireTracker = 4;
 	public static void run(RobotController rcin)
 	{
 		rc = rcin;
@@ -24,12 +24,20 @@ public class RobotPlayer
 				{
 					if (rc.getRobot().getID() < 120)
 					{
-						runPastrBuilder(farm1);
+						runPastrBuilder(farm1 = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
 					}
 					else if (rc.getRobot().getID() > 120 && rc.getRobot().getID() < 210 && rc.sensePastrLocations(rc.getTeam()).length > 0)
 					{
 						runTowerBuilder(rc.sensePastrLocations(rc.getTeam())[0]);
 					}
+//					else if (rc.getRobot().getID() < 120)
+//					{
+//						runPastrBuilder(farm1 = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
+//					}
+//					else if (rc.getRobot().getID() > 120 && rc.getRobot().getID() < 210 && rc.sensePastrLocations(rc.getTeam()).length > 0)
+//					{
+//						runTowerBuilder(rc.sensePastrLocations(rc.getTeam())[0]);
+//					}
 					else
 					{
 						runSoldier();
@@ -58,13 +66,12 @@ public class RobotPlayer
 		//attacking
 		attackEnemiesInRange();
 		
-//		
 		cowsOnMap = rc.senseCowGrowth();
 		if (cowsOnMap[rc.getMapWidth()-1][(rc.getMapHeight()/2)] >= 1)
 		{
 			if (rc.getLocation().equals(destination) || rc.getLocation().isAdjacentTo(destination) )
 			{
-				rc.construct(RobotType.NOISETOWER);
+				rc.construct(RobotType.PASTR);
 			}
 			else
 			{
@@ -92,7 +99,7 @@ public class RobotPlayer
 		{
 			if (rc.getLocation().isAdjacentTo(destination) )
 			{
-				rc.construct(RobotType.PASTR);
+				rc.construct(RobotType.NOISETOWER);
 			}
 			else
 			{
@@ -103,7 +110,7 @@ public class RobotPlayer
 		}
 		else
 		{
-			runSoldier();
+			Movement.moveTowardsLocationBuglike(rc, farm1);
 		}
 		
 		
@@ -130,7 +137,7 @@ public class RobotPlayer
 			noisetowerFireTracker--;
 			if (noisetowerFireTracker < 1)
 			{
-				noisetowerFireTracker = 5;
+				noisetowerFireTracker = 4;
 				noisetowerDirTracker++;
 			}
 		}
@@ -143,7 +150,7 @@ public class RobotPlayer
 			noisetowerFireTracker--;
 			if (noisetowerFireTracker < 1)
 			{
-				noisetowerFireTracker = 5;
+				noisetowerFireTracker = 4;
 				noisetowerDirTracker++;
 			}
 		}
@@ -156,7 +163,7 @@ public class RobotPlayer
 			noisetowerFireTracker--;
 			if (noisetowerFireTracker < 1)
 			{
-				noisetowerFireTracker = 5;
+				noisetowerFireTracker = 4;
 				noisetowerDirTracker++;
 			}
 		}
@@ -169,7 +176,7 @@ public class RobotPlayer
 			noisetowerFireTracker--;
 			if (noisetowerFireTracker < 1)
 			{
-				noisetowerFireTracker = 5;
+				noisetowerFireTracker = 4;
 				noisetowerDirTracker++;
 			}
 		}
