@@ -13,6 +13,7 @@ public class Movement {
 	}
 	static movementState dirFlag = movementState.noObstacle;
 	static Direction currentDir;
+	
 	public static void moveRobotRandomly(RobotController rc) throws GameActionException 
 	{
 		int randomMovement = (int)(randomThing.nextDouble()*12);
@@ -23,6 +24,32 @@ public class Movement {
 			} //end inner if
 		} //end outer if
 		else {
+			Direction towardsEnemyHQ = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
+			if(rc.isActive() && rc.canMove(towardsEnemyHQ)) {
+				rc.move(towardsEnemyHQ);
+			}//end inner if
+		} //end else
+	}
+	
+	public static void moveRobotRandomlyTowardsEnemyPastr(RobotController rc) throws GameActionException 
+	{
+		int randomMovement = (int)(randomThing.nextDouble()*12);
+		if(randomMovement < 9) 
+		{
+			Direction chosenDir = allDirections[randomMovement];
+			if(rc.isActive() && rc.canMove(chosenDir)) {
+				rc.move(chosenDir);
+			} //end inner if
+		} //end outer if
+		else if (rc.sensePastrLocations(rc.getTeam().opponent()).length > 0)
+		{
+			Direction towardsEnemyPastr = rc.getLocation().directionTo(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
+			if(rc.isActive() && rc.canMove(towardsEnemyPastr)) {
+				rc.move(towardsEnemyPastr);
+			}//end inner if
+		} 
+		else 
+		{
 			Direction towardsEnemyHQ = rc.getLocation().directionTo(rc.senseEnemyHQLocation());
 			if(rc.isActive() && rc.canMove(towardsEnemyHQ)) {
 				rc.move(towardsEnemyHQ);

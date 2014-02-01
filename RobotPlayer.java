@@ -11,17 +11,15 @@ public class RobotPlayer
 	static int robotsProduced;
 	static MapLocation place;
 	static double[][] cowsOnMap;
+	static int noisetowerTracker = 0;
 	public static void run(RobotController rcin)
 	{
 		rc = rcin;
 		randomThing.setSeed(rc.getRobot().getID());
 		while(true){
 			try{
-				if(rc.getType()==RobotType.HQ)
+				if(rc.getType()==RobotType.SOLDIER)
 				{
-					runHeadquarters();
-				}
-				else if(rc.getType()==RobotType.SOLDIER){
 					if (rc.getRobot().getID() < 120)
 					{
 						runBuilder(place = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
@@ -31,6 +29,15 @@ public class RobotPlayer
 					{
 						runSoldier();
 					}
+				}
+				
+//				else if(rc.getType()==RobotType.NOISETOWER)
+//				{
+//					runNoisetower();
+//				}
+				else if(rc.getType()==RobotType.HQ)
+				{
+					runHeadquarters();
 				}
 				
 				
@@ -75,11 +82,30 @@ public class RobotPlayer
 		attackEnemiesInRange();
 		
 		//movement
-		Movement.moveRobotRandomly(rc);
+		Movement.moveRobotRandomlyTowardsEnemyPastr(rc);
 		
 	} //end runSoldier()
 	
+//	private static void runNoisetower() throws GameActionException 
+//	{
+//		if 
+//		if (canAttackSquare();)
+//		{
+//			attackSquare();
+//		}
+//	} //end runNoisetower()
 	
+	private static void runHeadquarters() throws GameActionException 
+	{
+		Direction spawnDir = getFirstEmptySquareClockwiseFromTop();
+		
+		attackEnemiesInRange();
+		
+		if(rc.isActive()&&rc.senseRobotCount()<GameConstants.MAX_ROBOTS&&spawnDir!=Direction.NONE){
+			rc.spawn(spawnDir);
+			robotsProduced++;
+		}
+	} //end runHeadquarters()
 	
 	private static void attackEnemiesInRange() throws GameActionException 
 	{
@@ -108,22 +134,6 @@ public class RobotPlayer
 		if(rc.isActive() && rc.canMove(chosenDir)) {
 			rc.move(chosenDir);
 		} 
-	}
-	
-
-	
-	
-	private static void runHeadquarters() throws GameActionException 
-	{
-		Direction spawnDir = getFirstEmptySquareClockwiseFromTop();
-		
-		attackEnemiesInRange();
-		
-		if(rc.isActive()&&rc.senseRobotCount()<GameConstants.MAX_ROBOTS&&spawnDir!=Direction.NONE){
-			rc.spawn(spawnDir);
-			robotsProduced++;
-		}
-		
 	}
 	
 	
