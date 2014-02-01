@@ -27,15 +27,19 @@ public class RobotPlayer
 				{
 					if (rc.getRobot().getID() < 120) //East side
 					{
-						runPastrBuilder(new MapLocation(2, ((rc.getMapHeight()/4)-3)));
+						runPastrBuilder(new MapLocation(4, ((rc.getMapHeight()/4)-1)));
 					}
 					else if (rc.getRobot().getID() >= 120 && rc.getRobot().getID() < 210)
 					{
-						runTowerBuilder(new MapLocation(2, (rc.getMapHeight()/4)));
+						runTowerBuilder(new MapLocation(4, (rc.getMapHeight()/4)));
 					}
 					else if (rc.getRobot().getID() >= 210 && rc.getRobot().getID() < 320) //West side (Story)
 					{
-						runPastrBuilder(new MapLocation(2, ((rc.getMapHeight()/4)+2)));
+						runPastrBuilder(new MapLocation(rc.getMapWidth()-4, ((rc.getMapHeight()/2))));
+					}
+					else if (rc.getRobot().getID() >= 320 && rc.getRobot().getID() < 470)
+					{
+						runTowerBuilder(new MapLocation(rc.getMapWidth()-4, ((rc.getMapHeight()/2)+1)));
 					}
 					else if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200)
 					{
@@ -216,26 +220,39 @@ public class RobotPlayer
 	
 	private static void runNoisetower() throws GameActionException 
 	{
-		if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200 && rc.isActive())  //Engage limit break
+		if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200 && rc.isActive() && rc.canAttackSquare(rc.sensePastrLocations(rc.getTeam().opponent())[0]))  //Engage limit break
 		{
 			rc.attackSquare(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
 		}
 		else
 		{
-//			if (noisetowerDirTracker%4 == 0) //Farm West.
-//			{
-//				if (rc.canAttackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2)))
-//				{
-//					rc.attackSquareLight(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
-//				}
-//				noisetowerFireTracker--;
-//				if (noisetowerFireTracker < 1)
-//				{
-//					noisetowerFireTracker = 4;
-//					noisetowerDirTracker++;
-//				}
-//			}
-			if (noisetowerDirTracker%5 == 0 && rc.isActive()) //Farm North.
+			if (noisetowerDirTracker%8 == 0) //Farm West.
+			{
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 1)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
+			}
+			else if (noisetowerDirTracker%8 == 1 && rc.isActive()) //Farm Northwest.
+			{
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH_WEST, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH_WEST, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 0)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
+			}
+			else if (noisetowerDirTracker%8 == 2 && rc.isActive()) //Farm North.
 			{
 				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2)))
 				{
@@ -248,7 +265,7 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (noisetowerDirTracker%5 == 1 && rc.isActive()) //Farm East.
+			else if (noisetowerDirTracker%8 == 4 && rc.isActive()) //Farm East.
 			{
 				if (rc.canAttackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2)))
 				{
@@ -261,7 +278,7 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (noisetowerDirTracker%5 == 2 && rc.isActive()) //Farm northEast.
+			else if (noisetowerDirTracker%8 == 3 && rc.isActive()) //Farm northEast.
 			{
 				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*2)))
 				{
@@ -274,7 +291,7 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (noisetowerDirTracker%5 == 3 && rc.isActive()) //Farm SouthEast.
+			else if (noisetowerDirTracker%8 == 5 && rc.isActive()) //Farm SouthEast.
 			{
 				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*2)))
 				{
@@ -287,11 +304,25 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (rc.getActionDelay() < 1 && rc.isActive()) //Farm South
+			else if (noisetowerDirTracker%8 == 6 && rc.isActive()) //Farm South.
 			{
 				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2)))
 				{
 					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 0)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
+			}
+			
+			else if (rc.getActionDelay() < 1 && rc.isActive()) //Farm Southwest
+			{
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH_WEST, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH_WEST, noisetowerFireTracker*2));
 				}
 				noisetowerFireTracker--;
 				if (noisetowerFireTracker < 1)
