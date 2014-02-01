@@ -9,9 +9,11 @@ public class RobotPlayer
 	static Random randomThing = new Random();
 	static Direction allDirections[] = Direction.values();
 	static int robotsProduced;
-	static MapLocation place;
+	static MapLocation farm1 = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2));
+	static MapLocation farm2;
 	static double[][] cowsOnMap;
-	static int noisetowerTracker = 0;
+	static int noisetowerDirTracker = 0;
+	static int noisetowerFireTracker = 5;
 	public static void run(RobotController rcin)
 	{
 		rc = rcin;
@@ -22,8 +24,11 @@ public class RobotPlayer
 				{
 					if (rc.getRobot().getID() < 120)
 					{
-						runBuilder(place = new MapLocation(rc.getMapWidth(), (rc.getMapHeight()/2)));
-						System.out.println(rc.getMapWidth() + "///" + (rc.getMapHeight()/2));
+						runPastrBuilder(farm1);
+					}
+					else if (rc.getRobot().getID() > 120 && rc.getRobot().getID() < 210 && rc.sensePastrLocations(rc.getTeam()).length > 0)
+					{
+						runTowerBuilder(rc.sensePastrLocations(rc.getTeam())[0]);
 					}
 					else
 					{
@@ -31,10 +36,10 @@ public class RobotPlayer
 					}
 				}
 				
-//				else if(rc.getType()==RobotType.NOISETOWER)
-//				{
-//					runNoisetower();
-//				}
+				else if(rc.getType()==RobotType.NOISETOWER)
+				{
+					runNoisetower();
+				}
 				else if(rc.getType()==RobotType.HQ)
 				{
 					runHeadquarters();
@@ -48,7 +53,7 @@ public class RobotPlayer
 		}
 	}
 
-	private static void runBuilder(MapLocation destination) throws GameActionException 
+	private static void runPastrBuilder(MapLocation destination) throws GameActionException 
 	{
 		//attacking
 		attackEnemiesInRange();
@@ -58,6 +63,34 @@ public class RobotPlayer
 		if (cowsOnMap[rc.getMapWidth()-1][(rc.getMapHeight()/2)] >= 1)
 		{
 			if (rc.getLocation().equals(destination) || rc.getLocation().isAdjacentTo(destination) )
+			{
+				rc.construct(RobotType.NOISETOWER);
+			}
+			else
+			{
+				//movement
+				Movement movementInstance = new Movement();
+				movementInstance.moveTowardsLocationBuglike(rc, destination); //Should probably set this destination up to be whichever 
+			}																  //is farther from enemy HQ, or some other similar thing.
+		}
+		else
+		{
+			Movement.moveTowardsLocationBuglike(rc, destination);
+		}
+		
+		
+	} //end runPastrBuilder()
+	
+	private static void runTowerBuilder(MapLocation destination) throws GameActionException 
+	{
+		//attacking
+		attackEnemiesInRange();
+		
+//		
+		cowsOnMap = rc.senseCowGrowth();
+		if (cowsOnMap[rc.getMapWidth()-1][(rc.getMapHeight()/2)] >= 1)
+		{
+			if (rc.getLocation().isAdjacentTo(destination) )
 			{
 				rc.construct(RobotType.PASTR);
 			}
@@ -74,7 +107,7 @@ public class RobotPlayer
 		}
 		
 		
-	} //end runSoldier()
+	} //end runTowerBuilder()
 	
 	private static void runSoldier() throws GameActionException 
 	{
@@ -86,14 +119,63 @@ public class RobotPlayer
 		
 	} //end runSoldier()
 	
-//	private static void runNoisetower() throws GameActionException 
-//	{
-//		if 
-//		if (canAttackSquare();)
-//		{
-//			attackSquare();
-//		}
-//	} //end runNoisetower()
+	private static void runNoisetower() throws GameActionException 
+	{
+		if (noisetowerDirTracker%4 == 0) //Farm West.
+		{
+			if (rc.canAttackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2)))
+			{
+				rc.attackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
+			}
+			noisetowerFireTracker--;
+			if (noisetowerFireTracker < 1)
+			{
+				noisetowerFireTracker = 5;
+				noisetowerDirTracker++;
+			}
+		}
+		else if (noisetowerDirTracker%4 == 1) //Farm North.
+		{
+			if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2)))
+			{
+				rc.attackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2));
+			}
+			noisetowerFireTracker--;
+			if (noisetowerFireTracker < 1)
+			{
+				noisetowerFireTracker = 5;
+				noisetowerDirTracker++;
+			}
+		}
+		else if (noisetowerDirTracker%4 == 2) //Farm East.
+		{
+			if (rc.canAttackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2)))
+			{
+				rc.attackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2));
+			}
+			noisetowerFireTracker--;
+			if (noisetowerFireTracker < 1)
+			{
+				noisetowerFireTracker = 5;
+				noisetowerDirTracker++;
+			}
+		}
+		else //Farm South
+		{
+			if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2)))
+			{
+				rc.attackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2));
+			}
+			noisetowerFireTracker--;
+			if (noisetowerFireTracker < 1)
+			{
+				noisetowerFireTracker = 5;
+				noisetowerDirTracker++;
+			}
+		}
+		
+		
+	} //end runNoisetower()
 	
 	private static void runHeadquarters() throws GameActionException 
 	{
