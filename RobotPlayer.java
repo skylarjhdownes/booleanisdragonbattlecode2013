@@ -319,6 +319,12 @@ public class RobotPlayer
 	
 	private static void runHeadquarters() throws GameActionException 
 	{
+		boolean isDragon = false;
+		if(!isDragon){
+			rc.wearHat();
+			isDragon = true;
+		} //end if
+		
 		Direction spawnDir = getFirstEmptySquareClockwiseFromTop();
 		
 		attackEnemiesInRange();
