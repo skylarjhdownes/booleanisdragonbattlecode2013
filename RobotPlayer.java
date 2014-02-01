@@ -37,6 +37,10 @@ public class RobotPlayer
 					{
 						runPastrBuilder(new MapLocation(2, ((rc.getMapHeight()/4)+2)));
 					}
+					else if (rc.getRobot().getID() >= 320 && rc.getRobot().getID() < 500)
+					{
+						NTLimitBreaker(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
+					}
 					else if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200)
 					{
 						NTLimitBreaker(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
@@ -216,9 +220,17 @@ public class RobotPlayer
 	
 	private static void runNoisetower() throws GameActionException 
 	{
-		if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200 && rc.isActive())  //Engage limit break
+		if (rc.getRobot().getID() >= 900 && rc.getActionDelay() < 1)  //Engage limit break
 		{
+
 			rc.attackSquare(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
+
+		}
+		else if (rc.getRobot().getID() >= 1150 && rc.getActionDelay() < 1)  //Engage limit break
+		{
+
+			rc.attackSquare(rc.sensePastrLocations(rc.getTeam().opponent())[0].add(Direction.NORTH, 5));
+
 		}
 		else
 		{
@@ -235,11 +247,11 @@ public class RobotPlayer
 //					noisetowerDirTracker++;
 //				}
 //			}
-			if (noisetowerDirTracker%5 == 0 && rc.isActive()) //Farm North.
+			if (noisetowerDirTracker%5 == 0 && rc.getActionDelay() < 1) //Farm North.
 			{
-				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2)))
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*3)))
 				{
-					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2));
+					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*3));
 				}
 				noisetowerFireTracker--;
 				if (noisetowerFireTracker < 0)
@@ -248,11 +260,11 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (noisetowerDirTracker%5 == 1 && rc.isActive()) //Farm East.
+			else if (noisetowerDirTracker%5 == 1 && rc.getActionDelay() < 1) //Farm East.
 			{
-				if (rc.canAttackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2)))
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*3)))
 				{
-					rc.attackSquareLight(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2));
+					rc.attackSquareLight(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*3));
 				}
 				noisetowerFireTracker--;
 				if (noisetowerFireTracker < 1)
@@ -261,11 +273,11 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (noisetowerDirTracker%5 == 2 && rc.isActive()) //Farm northEast.
+			else if (noisetowerDirTracker%5 == 2 && rc.getActionDelay() < 1) //Farm northEast.
 			{
-				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*2)))
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*3)))
 				{
-					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*2));
+					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*3));
 				}
 				noisetowerFireTracker--;
 				if (noisetowerFireTracker < 1)
@@ -274,11 +286,11 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (noisetowerDirTracker%5 == 3 && rc.isActive()) //Farm SouthEast.
+			else if (noisetowerDirTracker%5 == 3 && rc.getActionDelay() < 1) //Farm SouthEast.
 			{
-				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*2)))
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*3)))
 				{
-					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*2));
+					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*3));
 				}
 				noisetowerFireTracker--;
 				if (noisetowerFireTracker < 1)
@@ -287,11 +299,11 @@ public class RobotPlayer
 					noisetowerDirTracker++;
 				}
 			}
-			else if (rc.getActionDelay() < 1 && rc.isActive()) //Farm South
+			else if (rc.getActionDelay() < 1) //Farm South
 			{
-				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2)))
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*3)))
 				{
-					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2));
+					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*3));
 				}
 				noisetowerFireTracker--;
 				if (noisetowerFireTracker < 1)
@@ -362,12 +374,13 @@ public class RobotPlayer
 	private static void NTLimitBreaker(MapLocation destination) throws GameActionException 
 	{
 		
-		if(rc.getLocation().distanceSquaredTo(destination) < 310)
+		if(rc.getLocation().distanceSquaredTo(destination) > 250)
 		{
 			Movement.moveTowardsLocationBuglike(rc, destination);
 		}
-		else if (rc.isActive())
+		else 
 		{
+			rc.construct(RobotType.NOISETOWER);
 		}
 	} 
 } //end RobotPlayer class
