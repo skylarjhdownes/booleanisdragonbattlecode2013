@@ -132,7 +132,7 @@ public class RobotPlayer
 		//generate a route to the enemy HQ
 		
 		if(!routeMapped){	//this is temporary code I used during testing to ensure each robot only generated the route once. We'll want to replace this with a function that generates new routes when they're needed
-			route = pathToGoal(rc.getLocation(), rc.senseEnemyHQLocation()); //This is how we tell it to generate a path to some location. Path is returned as an arraylist of MapLocations.
+			route = Movement.pathToGoal(rc, rc.getLocation(), rc.senseEnemyHQLocation()); //This is how we tell it to generate a path to some location. Path is returned as an arraylist of MapLocations.
 			routeMapped = true;
 		}
 		
@@ -217,82 +217,9 @@ public class RobotPlayer
 		}
 	} //end runHeadquarters()
 	
-	private static ArrayList<MapLocation> pathToGoal(MapLocation start, MapLocation goal) {
-		int mapHeight = rc.getMapHeight();
-		int mapWidth = rc.getMapWidth();
-		
-		MapLocation[][] origins = new MapLocation[mapWidth][mapHeight];
-		for(int i=0; i<mapWidth; i++){
-			for(int j=0; j<mapHeight; j++){
-				origins[i][j] = null;
-			}//end inner for
-		} //end outer for
-		Set<MapLocation>front = new HashSet<MapLocation>();
-		
-		MapLocation[] adjacentSquares = findAdjacent(start);
-		for(int i=0; i < adjacentSquares.length; i++){
-			TerrainTile terrainAtLocation = rc.senseTerrainTile(adjacentSquares[i]);
-			if(terrainAtLocation == TerrainTile.NORMAL || terrainAtLocation == TerrainTile.ROAD){
-				front.add(adjacentSquares[i]);
-			}//end if
-		}//end for				//done adding starting squares to front
-		while(true){
-			MapLocation bestOption = findBestOption(front, goal);;
-			front.remove(bestOption);
-			adjacentSquares = findAdjacent(bestOption);
-			for(int i=0; i < adjacentSquares.length; i++){
-				TerrainTile terrainAtLocation = rc.senseTerrainTile(adjacentSquares[i]);
-				if((terrainAtLocation == TerrainTile.NORMAL || terrainAtLocation == TerrainTile.ROAD) && adjacentSquares[i] != rc.senseHQLocation() && origins[adjacentSquares[i].x][adjacentSquares[i].y] == null){
-					front.add(adjacentSquares[i]);
-					origins[adjacentSquares[i].x][adjacentSquares[i].y] = bestOption;
-				} //end if
-			} //end for
-			
-			if(bestOption.isAdjacentTo(goal)){
-				System.out.println("Route calculated!");
-				break;
-			}//end if
-		}//end while
-		System.out.println("Route mapped!");
-		
-		ArrayList<MapLocation> route = new ArrayList<MapLocation>();
-		MapLocation currentPosition = goal;
-		route.add(currentPosition);
-		while(!currentPosition.isAdjacentTo(start)){
-			currentPosition = origins[currentPosition.x][currentPosition.y];
-			route.add(currentPosition);
-		}//end while
-		
-		Collections.reverse(route); //reverse the arraylist into the expected order
-		return route;
-	}//end pathToGoal()
+
 	
-	private static MapLocation findBestOption(Set<MapLocation> front, MapLocation goal){
-		MapLocation bestPosition = null;
-		float distanceOfBestPosition = Float.MAX_VALUE;
-		for(MapLocation i : front){
-			float distance = i.distanceSquaredTo(goal);
-			if(distance < distanceOfBestPosition){
-				distanceOfBestPosition = distance;
-				bestPosition = i;
-			}//end if
-		}//end for
-		
-		return bestPosition;
-	} //end findBestOption
 	
-	private static MapLocation[] findAdjacent(MapLocation location){
-		MapLocation[] array = new MapLocation[8];
-		array[0] = location.add(0,1); //add North
-		array[1] = location.add(1,1); //add Northeast
-		array[2] = location.add(1,0); //add East
-		array[3] = location.add(1,-1); //add Southeast
-		array[4] = location.add(0,-1); //add South
-		array[5] = location.add(-1,-1); //add Southwest
-		array[6] = location.add(-1,0); //add West
-		array[7] = location.add(-1,1); //add Northwest
-		return array;
-	} //end findAdjacent()
 	
 	private static void attackEnemiesInRange() throws GameActionException 
 	{
@@ -312,16 +239,6 @@ public class RobotPlayer
 //			}//end if
 //		}//end else
 	} //end attackEnemiesInRange()
-	
-	
-	
-	private static void moveTowardsLocationDirectly(MapLocation destination) throws GameActionException 
-	{
-		Direction chosenDir = rc.getLocation().directionTo(destination);
-		if(rc.isActive() && rc.canMove(chosenDir)) {
-			rc.move(chosenDir);
-		} 
-	} //end moveTowardsLocationDirectly()
 	
 	// Keep this method checking canMove and not if the square is empty (Void squares)
 	private static Direction getFirstEmptySquareClockwiseFromTop() throws GameActionException 
