@@ -13,7 +13,7 @@ public class RobotPlayer
 	static double[][] cowsOnMap;
 	static int noisetowerDirTracker = 0;
 	static int noisetowerFireTracker = 4;
-	static int pastrsProduced; //if we find this to be much higher than our number of current pastrs, we know our opponent is aggresively targeting our pastrs. Any surving pastrs should be defended, and we should probably consider not building more.
+	static int pastrsProduced; //if we find this to be much higher than our number of current pastrs, we know our opponent is aggressively targeting our pastrs. Any surving pastrs should be defended, and we should probably consider not building more.
 	
 	
 	public static void run(RobotController rcin)
@@ -25,39 +25,55 @@ public class RobotPlayer
 			try{
 				if(rc.getType()==RobotType.SOLDIER)
 				{
-					if (rc.getRobot().getID() < 120)
+					if (rc.getRobot().getID() < 120) //East side
 					{
-						runPastrBuilder(new MapLocation(rc.getMapWidth()-1, (rc.getMapHeight()/2)));
+						runPastrBuilder(new MapLocation(2, ((rc.getMapHeight()/4)-3)));
 					}
 					else if (rc.getRobot().getID() >= 120 && rc.getRobot().getID() < 210)
 					{
-						runTowerBuilder(new MapLocation(rc.getMapWidth()-1, (rc.getMapHeight()/2)));
+						runTowerBuilder(new MapLocation(2, (rc.getMapHeight()/4)));
 					}
-					else if (rc.getRobot().getID() >= 210 && rc.getRobot().getID() < 320)
+					else if (rc.getRobot().getID() >= 210 && rc.getRobot().getID() < 320) //West side (Story)
 					{
-						runPastrBuilder(new MapLocation(0, (rc.getMapHeight()/2)));
+						runPastrBuilder(new MapLocation(2, ((rc.getMapHeight()/4)+2)));
 					}
-					else if (rc.getRobot().getID() >= 320 && rc.getRobot().getID() < 500)
+					else if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200)
 					{
-						runTowerBuilder(new MapLocation(0, (rc.getMapHeight()/2)));
+						NTLimitBreaker(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
 					}
-					else if (rc.getRobot().getID() >= 500 && rc.getRobot().getID() < 650)
+					else if (rc.getRobot().getID() >= 2000 && rc.getRobot().getID() < 2200)
 					{
-						runPastrBuilder(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
+						NTLimitBreaker(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
 					}
-					else if (rc.getRobot().getID() >= 650 && rc.getRobot().getID() < 850)
-					{
-						runTowerBuilder(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
-					}
+//					else if (rc.getRobot().getID() >= 320 && rc.getRobot().getID() < 500)
+//					{
+//						runPastrBuilder(new MapLocation(0, (rc.getMapHeight()/2)));
+//					}
+//					else if (rc.getRobot().getID() >= 500 && rc.getRobot().getID() < 650) //South side
+//					{
+//						runPastrBuilder(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
+//					}
+//					else if (rc.getRobot().getID() >= 650 && rc.getRobot().getID() < 850)
+//					{
+//						runTowerBuilder(new MapLocation(rc.getMapWidth()/2, (rc.getMapHeight()-1)));
+//					}
+//					else if (rc.getRobot().getID() >= 850 && rc.getRobot().getID() < 1000) //North side
+//					{
+//						runPastrBuilder(new MapLocation(rc.getMapWidth()/2, (0)));
+//					}
+//					else if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200)
+//					{
+//						runTowerBuilder(new MapLocation(rc.getMapWidth()/2, (0)));
+//					}
 					else
 					{
-						if (rc.sensePastrLocations(rc.getTeam().opponent()).length > 0)
+						if (rc.sensePastrLocations(rc.getTeam().opponent()).length > 0 && Clock.getRoundNum() > 300)
 						{
-							runSoldier(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
+							runAtkSoldier(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
 						} 
 						else 
 						{
-							runSoldier(rc.senseEnemyHQLocation());
+							runDefSoldier(new MapLocation(0, (rc.getMapHeight()/2)));
 						} //end else
 					}
 				}
@@ -95,7 +111,7 @@ public class RobotPlayer
 			{
 				//movement
 				Movement movementInstance = new Movement();
-				movementInstance.moveTowardsLocationBuglike(rc, destination);
+				movementInstance.moveTowardsLocationDirectly(rc, destination);
 			}																  
 		}
 		else
@@ -132,11 +148,34 @@ public class RobotPlayer
 //				rc.construct(RobotType.PASTR);
 //			}
 		}
-		
-		
 	} //end runTowerBuilder()
 	
-	private static void runSoldier(MapLocation destination) throws GameActionException 
+	private static void runAuxiliaryPastrBuilder(MapLocation destination) throws GameActionException 
+	{
+		//attacking
+		attackEnemiesInRange();
+		
+		cowsOnMap = rc.senseCowGrowth();
+		if (cowsOnMap[destination.x][destination.y] >= 1)
+		{
+			if (rc.getLocation().equals(destination) || rc.getLocation().isAdjacentTo(destination) )
+			{
+				rc.construct(RobotType.PASTR);
+			}
+			else
+			{
+				//movement
+				Movement movementInstance = new Movement();
+				movementInstance.moveTowardsLocationBuglike(rc, destination);
+			}																  
+		}
+		else
+		{
+			Movement.moveTowardsLocationBuglike(rc, destination);
+		}
+	} //end runAuxiliaryPastrBuilder()
+	
+	private static void runDefSoldier(MapLocation destination) throws GameActionException 
 	{
 		
 		//attacking
@@ -148,63 +187,118 @@ public class RobotPlayer
 		
 		//generate a route to the enemy HQ
 		Movement movementInstance = new Movement();
-		
-		movementInstance.moveRobotRandomlyTowardsEnemyPastr(rc);
-		
-	} //end runSoldier()
+		if (rc.getLocation().distanceSquaredTo(destination) > 5)
+		{
+			movementInstance.moveOnRoute(rc, destination);
+		}
+	} //end runDefSoldier()
+	
+	private static void runAtkSoldier(MapLocation destination) throws GameActionException 
+	{
+		//attacking
+				attackEnemiesInRange();
+				
+				//movement
+
+				//Movement.moveRobotRandomly(rc);
+				
+				//generate a route to the enemy HQ
+				Movement movementInstance = new Movement();
+				if (rc.getLocation().distanceSquaredTo(destination) > 100)
+				{
+					movementInstance.moveOnRoute(rc, destination);
+				}
+				else 
+				{
+					movementInstance.moveRobotRandomlyTowardsEnemyPastr(rc);
+				}
+	} //end runAtkSoldier()
 	
 	private static void runNoisetower() throws GameActionException 
 	{
-		if (noisetowerDirTracker%4 == 0) //Farm West.
+		if (rc.getRobot().getID() >= 1000 && rc.getRobot().getID() < 1200 && rc.isActive())  //Engage limit break
 		{
-			if (rc.canAttackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2)))
-			{
-				rc.attackSquareLight(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
-			}
-			noisetowerFireTracker--;
-			if (noisetowerFireTracker < 1)
-			{
-				noisetowerFireTracker = 4;
-				noisetowerDirTracker++;
-			}
+			rc.attackSquare(rc.sensePastrLocations(rc.getTeam().opponent())[0]);
 		}
-		else if (noisetowerDirTracker%4 == 1) //Farm North.
+		else
 		{
-			if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2)))
+//			if (noisetowerDirTracker%4 == 0) //Farm West.
+//			{
+//				if (rc.canAttackSquare(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2)))
+//				{
+//					rc.attackSquareLight(rc.getLocation().add(Direction.WEST, noisetowerFireTracker*2));
+//				}
+//				noisetowerFireTracker--;
+//				if (noisetowerFireTracker < 1)
+//				{
+//					noisetowerFireTracker = 4;
+//					noisetowerDirTracker++;
+//				}
+//			}
+			if (noisetowerDirTracker%5 == 0 && rc.isActive()) //Farm North.
 			{
-				rc.attackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2));
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 0)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
 			}
-			noisetowerFireTracker--;
-			if (noisetowerFireTracker < 1)
+			else if (noisetowerDirTracker%5 == 1 && rc.isActive()) //Farm East.
 			{
-				noisetowerFireTracker = 4;
-				noisetowerDirTracker++;
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 1)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
 			}
-		}
-		else if (noisetowerDirTracker%4 == 2) //Farm East.
-		{
-			if (rc.canAttackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2)))
+			else if (noisetowerDirTracker%5 == 2 && rc.isActive()) //Farm northEast.
 			{
-				rc.attackSquare(rc.getLocation().add(Direction.EAST, noisetowerFireTracker*2));
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.NORTH_EAST, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 1)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
 			}
-			noisetowerFireTracker--;
-			if (noisetowerFireTracker < 1)
+			else if (noisetowerDirTracker%5 == 3 && rc.isActive()) //Farm SouthEast.
 			{
-				noisetowerFireTracker = 4;
-				noisetowerDirTracker++;
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH_EAST, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 1)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
 			}
-		}
-		else //Farm South
-		{
-			if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2)))
+			else if (rc.getActionDelay() < 1 && rc.isActive()) //Farm South
 			{
-				rc.attackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2));
-			}
-			noisetowerFireTracker--;
-			if (noisetowerFireTracker < 1)
-			{
-				noisetowerFireTracker = 4;
-				noisetowerDirTracker++;
+				if (rc.canAttackSquare(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2)))
+				{
+					rc.attackSquareLight(rc.getLocation().add(Direction.SOUTH, noisetowerFireTracker*2));
+				}
+				noisetowerFireTracker--;
+				if (noisetowerFireTracker < 1)
+				{
+					noisetowerFireTracker = 4;
+					noisetowerDirTracker++;
+				}
 			}
 		}
 		
@@ -264,5 +358,16 @@ public class RobotPlayer
 		{
 			return returnDir; //Returns the first empty square detected
 		}
-	} //end getFirstEmptySquareClockwiseFromTop()
+	}
+	private static void NTLimitBreaker(MapLocation destination) throws GameActionException 
+	{
+		
+		if(rc.getLocation().distanceSquaredTo(destination) < 310)
+		{
+			Movement.moveTowardsLocationBuglike(rc, destination);
+		}
+		else if (rc.isActive())
+		{
+		}
+	} 
 } //end RobotPlayer class
